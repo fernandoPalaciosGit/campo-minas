@@ -1,6 +1,7 @@
 // METODO DE CLASE MEJORANDOLA: creamos un array BIDMENSIONAL
 var	matrixGame = [],
 		levelHard, userHits,
+		resetTrick,
 		levelHits, MAXBOMBS; // la dimension de la matriz seleccionada menos las bombas
 
 var createMatrix = function (event){
@@ -9,9 +10,16 @@ var createMatrix = function (event){
 	
 	// dejaremos de ejecutar la matriz si cargamos <select> por primera vez (la opcion es nula)
 	if( !selectedMatrix ) return false;
- 
-	var wrapperMatrix = document.getElementById('matrixMine');
+
+	// resetear el tiempo de trampa
+	window.clearTimeout(resetTrick);
+
+	//mostrar botones de juego
+	document.getElementById('trick').style.display = 'inline';
+	document.getElementById('reset').style.display = 'inline';
+
 	//vaciar matriz actual y resetear el nivel de dificultad
+	var wrapperMatrix = document.getElementById('matrixMine');
 	wrapperMatrix.innerHTML = "";
 	userHits = 0;
 	levelHard = selectHardness.options[selectHardness.selectedIndex].dataset.level;
@@ -46,8 +54,9 @@ var evaluateGame = function (evClcik){
 
 	// mostrar visualmente el resultado de la eleccion
 	this.style.backgroundImage = "url('img/"+this.dataset.img+".png')";
-	this.style.backgroundColor =  'white';
-	this.style.border =  'none';
+
+	//bloqueamos el resultado que hemos seleccionado para no volverlo a repetir
+	this.disabled = true;
 
 	// reseteamos la matriz en el caso de que pierda o gane
 	if( apuesta == 1){
@@ -64,7 +73,7 @@ var evaluateGame = function (evClcik){
 	}
 };
 
-var createHtmlMatrix = function (matrixLevel, levelHard){	
+var createHtmlMatrix = function (matrixLevel, levelHard){
 	var	htmlMatrix = "",
 			maxLevelHard = 0,
 			imgBtn = '';
@@ -109,9 +118,38 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 		htmlMatrix += '</div>';
 	}
 		console.log('numeroo de bombas: '+MAXBOMBS);
-		console.log(matrixGame);
 
 	return htmlMatrix;
+};
+
+var solucionMomentanea = function (evClick){
+	/* mostrar visualmente el resultado de la eleccion
+	- mientras estan visibles impedir la interaccion.
+	- solo mostrar aquellos que no tiene backgroundImage */
+
+	var btnMatrix = document.getElementsByClassName('btnMatrix');
+	for (var i = 0, len = btnMatrix.length; i < len; i++) {
+		btnMatrix[i].disabled = true;
+
+		//añadir un puntero de visualizados a aquello que se han mostrado
+		if( btnMatrix[i].style.backgroundImage === "" ){
+			btnMatrix[i].dataset.trampa = 'mostrar';
+			btnMatrix[i].style.backgroundImage = "url('img/"+btnMatrix[i].dataset.img+".png')";
+		}
+	}
+
+	resetTrick = window.setTimeout(function(){
+		for (var i = 0, len = btnMatrix.length; i < len; i++) {
+			btnMatrix[i].disabled = false;
+
+			//eliminar el puntero de aquellos que se han visulazados
+			if( btnMatrix[i].dataset.trampa === "mostrar"){
+				btnMatrix[i].dataset.trampa = '';
+				btnMatrix[i].style.backgroundImage = "";
+			}
+
+		}
+	}, 500);
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
@@ -125,4 +163,7 @@ var getRandomArbitrary = function (min, max) {
 
 	var resetMatrix = document.getElementsByName('resetGame')[0];
 	resetMatrix.addEventListener('click', createMatrix, false);
+
+	var trick = document.getElementById('trick');
+	trick.addEventListener('click', solucionMomentanea, false);
 }(window));

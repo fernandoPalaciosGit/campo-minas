@@ -5,10 +5,18 @@ margin: 2px;
 background-repeat: no-repeat;
 background-size: 100%;
 outline: none;
+border: 1px solid rgb(0, 0, 0);
+background-image: none;
+background-color: rgb(221, 221, 221);
+box-shadow: 1px 1px 2px #000;
+border-radius: 2px;
 }
 .level, .hits{
 	font-weight: bold;
 }
 .hits{
 	color: green;
+}
+#trick, #reset{
+	display: none;
 }
