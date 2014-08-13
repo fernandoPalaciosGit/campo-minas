@@ -6,3 +6,6 @@ background-repeat: no-repeat;
 background-size: 100%;
 outline: none;
 }
+.level{
+	font-weight: bold;
+}

@@ -1,5 +1,6 @@
 // METODO DE CLASE MEJORANDOLA: creamos un array BIDMENSIONAL
-var matrixGame = [];
+var	matrixGame = [],
+		levelHard;
 
 var createMatrix = function (event){
 	var	selectHardness = document.getElementsByName('hardness')[0],
@@ -7,16 +8,16 @@ var createMatrix = function (event){
 	
 	// dejaremos de ejecutar la matriz si cargamos <select> por primera vez (la opcion es nula)
 	if( !selectedMatrix ) return false;
-
+ 
 	var wrapperMatrix = document.getElementById('matrixMine');
-	//vaciar matriz actual
+	//vaciar matriz actual y resetear el nivel de dificultad
 	wrapperMatrix.innerHTML = "";
-
-	//resetear nuestro array de juego
+	levelHard = selectHardness.options[selectHardness.selectedIndex].dataset.level;
+	document.getElementsByClassName('level')[0].innerText = "Cuidado, hay "+levelHard+" minas";
 	matrixGame = [];
 
 	//crear el html de la matriz
-	var nuevaMatriz = htmlMatrix(selectedMatrix);
+	var nuevaMatriz = createHtmlMatrix(selectedMatrix, levelHard);
 
 	//añadir el html de la matriz
 	wrapperMatrix.innerHTML = nuevaMatriz;
@@ -34,7 +35,8 @@ var evaluateGame = function (evClcik){
 			posY = this.dataset.posy,
 			apuesta = matrixGame[posY][posX];
 
-	console.log('valor matriz: '+matrixGame[posY][posX]); //deberia ser igual a la apuesta
+	// console.log('valor matriz: '+matrixGame[posY][posX]); //deberia ser igual a la apuesta
+	console.log(matrixGame);
 	console.log('apuesta: '+apuesta, 'posX: '+posX, 'posY: '+posY);
 
 	// mostrar visualmente el resultado de la eleccion
@@ -42,15 +44,17 @@ var evaluateGame = function (evClcik){
 	this.style.backgroundColor =  'white';
 	this.style.border =  'none';
 
-	if( apuesta === 1){
+	if( apuesta == 1){
 		window.alert('Nooooooooooooo\n¡¡¡ OTRA VEZ !!!');
 		// reseteamos la matriz
 		createMatrix();
 	}
-}
+};
 
-var htmlMatrix = function (matrixLevel){
-	var htmlMatrix = "";
+var createHtmlMatrix = function (matrixLevel, levelHard){	
+	var	htmlMatrix = "",
+			maxLevelHard = 0,
+			imgBtn = '';
 
 	matrixGame = new Array(matrixLevel);
 
@@ -62,16 +66,26 @@ var htmlMatrix = function (matrixLevel){
 			// creamos un valor aleatorio del 0 al 1
 			var randomVal = Math.round(getRandomArbitrary(0, 1));
 
-			// lo asigno a la matriz bidimensional del juego (matrixGame)
-			matrixGame[i][j] = randomVal;
 
-			// creo el boton de interaccion con el usuario
-			var imgBtn = ( randomVal === 1 ) ? 'bomb' : 'allow' ;
+			// creo el boton de interaccion con el usuario y contabilizo la dificultad maxima
+			if( randomVal == 1 && maxLevelHard < levelHard ){
+				maxLevelHard++;
+				imgBtn = 'bomb';
+				matrixGame[i][j] = 1;
+			}else{
+				imgBtn = 'allow';
+				matrixGame[i][j] = 0;
+			}
+			
+			// lo asigno a la matriz bidimensional del juego (matrixGame)
+
+			// el problema es que las bombas no estaran repartidas sobre el tablero ya que la seleccion de casillas es random
 			htmlMatrix +=	'<input type="button" class="btnMatrix" value="" ' +
 								'data-posx="'+j+'" data-posy="'+i+'" data-img="'+imgBtn+'"/>';
 		}
 		htmlMatrix += '</div>';
 	}
+		console.log(matrixGame);
 
 	return htmlMatrix;
 };
