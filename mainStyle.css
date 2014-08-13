@@ -6,6 +6,9 @@ background-repeat: no-repeat;
 background-size: 100%;
 outline: none;
 }
-.level{
+.level, .hits{
 	font-weight: bold;
+}
+.hits{
+	color: green;
 }

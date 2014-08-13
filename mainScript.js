@@ -1,6 +1,7 @@
 // METODO DE CLASE MEJORANDOLA: creamos un array BIDMENSIONAL
 var	matrixGame = [],
-		levelHard;
+		levelHard, userHits,
+		levelHits; // la dimension de la matriz seleccionada menos la dificultad
 
 var createMatrix = function (event){
 	var	selectHardness = document.getElementsByName('hardness')[0],
@@ -12,11 +13,14 @@ var createMatrix = function (event){
 	var wrapperMatrix = document.getElementById('matrixMine');
 	//vaciar matriz actual y resetear el nivel de dificultad
 	wrapperMatrix.innerHTML = "";
+	userHits = 0;
 	levelHard = selectHardness.options[selectHardness.selectedIndex].dataset.level;
+	document.getElementsByClassName('hits')[0].innerText = "";
 	document.getElementsByClassName('level')[0].innerText = "Cuidado, hay "+levelHard+" minas";
 	matrixGame = [];
 
 	//crear el html de la matriz
+	levelHits = (selectedMatrix * selectedMatrix) - levelHard;
 	var nuevaMatriz = createHtmlMatrix(selectedMatrix, levelHard);
 
 	//añadir el html de la matriz
@@ -44,10 +48,18 @@ var evaluateGame = function (evClcik){
 	this.style.backgroundColor =  'white';
 	this.style.border =  'none';
 
+	// reseteamos la matriz en el caso de que pierda o gane
 	if( apuesta == 1){
 		window.alert('Nooooooooooooo\n¡¡¡ OTRA VEZ !!!');
-		// reseteamos la matriz
 		createMatrix();
+	}else{
+		//mostarr al usuario la cantidad de aciertos restante
+		userHits++;
+		document.getElementsByClassName('hits')[0].innerText = "Te faltan "+(levelHits - userHits)+" aciertos";
+		if( userHits === levelHits){
+			window.alert('¡¡¡ GANASTE !!!\ntramposo ¬¬');
+			createMatrix();
+		}
 	}
 };
 
@@ -66,7 +78,6 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 			// creamos un valor aleatorio del 0 al 1
 			var randomVal = Math.round(getRandomArbitrary(0, 1));
 
-
 			// creo el boton de interaccion con el usuario y contabilizo la dificultad maxima
 			if( randomVal == 1 && maxLevelHard < levelHard ){
 				maxLevelHard++;
@@ -76,10 +87,7 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 				imgBtn = 'allow';
 				matrixGame[i][j] = 0;
 			}
-			
-			// lo asigno a la matriz bidimensional del juego (matrixGame)
 
-			// el problema es que las bombas no estaran repartidas sobre el tablero ya que la seleccion de casillas es random
 			htmlMatrix +=	'<input type="button" class="btnMatrix" value="" ' +
 								'data-posx="'+j+'" data-posy="'+i+'" data-img="'+imgBtn+'"/>';
 		}
