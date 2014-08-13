@@ -1,7 +1,7 @@
 // METODO DE CLASE MEJORANDOLA: creamos un array BIDMENSIONAL
 var	matrixGame = [],
 		levelHard, userHits,
-		levelHits; // la dimension de la matriz seleccionada menos la dificultad
+		levelHits, MAXBOMBS; // la dimension de la matriz seleccionada menos las bombas
 
 var createMatrix = function (event){
 	var	selectHardness = document.getElementsByName('hardness')[0],
@@ -16,12 +16,13 @@ var createMatrix = function (event){
 	userHits = 0;
 	levelHard = selectHardness.options[selectHardness.selectedIndex].dataset.level;
 	document.getElementsByClassName('hits')[0].innerText = "";
-	document.getElementsByClassName('level')[0].innerText = "Cuidado, hay "+levelHard+" minas";
 	matrixGame = [];
 
 	//crear el html de la matriz
-	levelHits = (selectedMatrix * selectedMatrix) - levelHard;
 	var nuevaMatriz = createHtmlMatrix(selectedMatrix, levelHard);
+
+	document.getElementsByClassName('level')[0].innerText = "Cuidado, hay "+MAXBOMBS+" minas";
+	levelHits = (selectedMatrix * selectedMatrix) - MAXBOMBS;
 
 	//añadir el html de la matriz
 	wrapperMatrix.innerHTML = nuevaMatriz;
@@ -67,12 +68,14 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 	var	htmlMatrix = "",
 			maxLevelHard = 0,
 			imgBtn = '';
+	MAXBOMBS = 0; //contador de bombas realeles del juego
 
 	matrixGame = new Array(matrixLevel);
 
 	for (var i = 0; i < matrixLevel ; i++) {
 		htmlMatrix += '<div class="rowMatrix">';
 		matrixGame[i] = new Array(matrixLevel);
+		var maxBombsByRow = 0;
 
 		for (var j = 0; j < matrixLevel ; j++) {
 			// creamos un valor aleatorio del 0 al 1
@@ -80,9 +83,21 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 
 			// creo el boton de interaccion con el usuario y contabilizo la dificultad maxima
 			if( randomVal == 1 && maxLevelHard < levelHard ){
-				maxLevelHard++;
+				maxBombsByRow++;
+
+				if( maxBombsByRow <= 2 ){
+					maxLevelHard++;
+					imgBtn = 'bomb';
+					matrixGame[i][j] = 1; //BOMBA
+					MAXBOMBS++;
+				}else{
+					imgBtn = 'allow';
+					matrixGame[i][j] = 0;
+				}
+			} else if ( maxBombsByRow > 2 && maxLevelHard < levelHard){
 				imgBtn = 'bomb';
-				matrixGame[i][j] = 1;
+				matrixGame[i][j] = 1; //BOMBA
+				MAXBOMBS++;
 			}else{
 				imgBtn = 'allow';
 				matrixGame[i][j] = 0;
@@ -93,6 +108,7 @@ var createHtmlMatrix = function (matrixLevel, levelHard){
 		}
 		htmlMatrix += '</div>';
 	}
+		console.log('numeroo de bombas: '+MAXBOMBS);
 		console.log(matrixGame);
 
 	return htmlMatrix;
